@@ -5,7 +5,17 @@ import Todo from "./Todo";
 import EditTodoForm from "./EditTodoForm";
 
 function TodoWrapper() {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState(() => {
+    // Load from localStorage on initial render
+    const savedTodos = localStorage.getItem("todos");
+    return savedTodos ? JSON.parse(savedTodos) : [];
+  });
+  const [filter, setFilter] = useState("all");
+
+  // Save todos to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
 
   const addTodo = (todo) => {
     setTodos([
@@ -13,10 +23,6 @@ function TodoWrapper() {
       { id: uuidv4(), task: todo, completed: false, isEditing: false },
     ]);
   };
-
-  useEffect(() => {
-    console.log("Todos updated:", todos);
-  }, [todos]);
 
   const toggleComplete = (id) => {
     setTodos(
@@ -41,16 +47,27 @@ function TodoWrapper() {
   const editTask = (task, id) => {
     setTodos(
       todos.map((todo) =>
-        todo.id === id ? { ...todo, task, isEditing: !todo.isEditing } : todo
+        todo.id === id ? { ...todo, task, isEditing: false } : todo
       )
     );
   };
+
+  const filteredTodos = todos.filter((todo) => {
+    if (filter === "completed") return todo.completed;
+    if (filter === "active") return !todo.completed;
+    return true;
+  });
 
   return (
     <div className="TodoWrapper">
       <h1>Get Things Done!</h1>
       <TodoForm addTodo={addTodo} />
-      {todos.map((todo) =>
+      <div className="filter-buttons">
+        <button onClick={() => setFilter("all")}>All</button>
+        <button onClick={() => setFilter("active")}>Active</button>
+        <button onClick={() => setFilter("completed")}>Completed</button>
+      </div>
+      {filteredTodos.map((todo) =>
         todo.isEditing ? (
           <EditTodoForm editTodo={editTask} task={todo} key={todo.id} />
         ) : (

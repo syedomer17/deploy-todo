@@ -5,13 +5,19 @@ function TodoForm({ addTodo }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!value.trim()) return; 
+    if (!value.trim()) return;
     addTodo(value);
-    setValue(""); 
+    setValue("");
   };
 
   return (
-    <form className="TodoForm" onSubmit={handleSubmit}>
+    <motion.form
+      className="TodoForm"
+      onSubmit={handleSubmit}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <input
         type="text"
         className="todo-input"
@@ -19,11 +25,15 @@ function TodoForm({ addTodo }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
-      <button type="submit" className="todo-btn">
+      <motion.button
+        type="submit"
+        className="todo-btn"
+        whileHover={{ scale: 1.1 }}
+      >
         Add Task
-      </button>
-    </form>
+      </motion.button>
+    </motion.form>
   );
 }
 
-export default TodoForm;
+export default TodoForm
